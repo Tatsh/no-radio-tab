@@ -1,9 +1,9 @@
 Package: sh.tat.noradiotab
 Name: NoRadioTab
 Depends: mobilesubstrate
-Version: 0.0.1
+Version: 0.0.2
 Architecture: iphoneos-arm
-Description: An awesome MobileSubstrate tweak!
+Description: Removes Radio tab from Music app on iPad. Also makes Songs the default tab.
 Maintainer: Tatsh
 Author: Tatsh
 Section: Tweaks
