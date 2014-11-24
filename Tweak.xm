@@ -8,18 +8,12 @@
 
 %hook MusicTabBarController
 BOOL isFirstRun = YES;
-BOOL shouldRun = NO;
 
 /**
  * Removes the "radio" controller identifier, which makes
  *   -[setViewControllers] never use it, and removes the tab.
  */
 -(void)_setOrderedViewControllerIdentifiers:(NSArray *)identifiers animated:(BOOL)animated notifyDelegate:(BOOL)notifyDelegate {
-    if (!shouldRun) {
-        %orig;
-        return;
-    }
-
     NSMutableArray *replacement = [NSMutableArray arrayWithCapacity:[identifiers count] - 1];
     for (NSString *s in identifiers) {
         if ([s isEqualToString:@"radio"]) {
@@ -34,7 +28,7 @@ BOOL shouldRun = NO;
  * Makes the Music app start at the Songs tab on first launch.
  */
 - (void)_setSelectedViewController:(MusicNavigationController *)vc {
-    if (!shouldRun || !isFirstRun) {
+    if (!isFirstRun) {
         %orig;
         return;
     }
@@ -43,7 +37,3 @@ BOOL shouldRun = NO;
     isFirstRun = NO;
 }
 %end
-
-%ctor {
-    shouldRun = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-}
