@@ -33,11 +33,19 @@
 %hook MusicTabBarController
 BOOL isFirstRun = YES;
 
+BOOL isPad() {
+    return [(NSString*)[UIDevice currentDevice].model hasPrefix:@"iPad"];
+}
+
 /**
  * Removes the "radio" controller identifier, which makes
  *   -[setViewControllers] never use it, and removes the tab.
  */
 -(void)_setOrderedViewControllerIdentifiers:(NSArray *)identifiers animated:(BOOL)animated notifyDelegate:(BOOL)notifyDelegate {
+    if (!isPad()) {
+        %orig;
+        return;
+    }
     NSMutableArray *replacement = [NSMutableArray arrayWithCapacity:[identifiers count] - 1];
     for (NSString *s in identifiers) {
         if ([s isEqualToString:@"radio"]) {
@@ -52,7 +60,7 @@ BOOL isFirstRun = YES;
  * Makes the Music app start at the Songs tab on first launch.
  */
 - (void)_setSelectedViewController:(MusicNavigationController *)vc {
-    if (!isFirstRun) {
+    if (!isFirstRun || !isPad()) {
         %orig;
         return;
     }
