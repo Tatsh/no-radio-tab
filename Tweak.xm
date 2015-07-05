@@ -4,10 +4,32 @@
 @end
 @interface MusicNavigationController : UINavigationController
 @end
+@interface SKUICrossFadingTabBarButton : UIControl
+@property (nonatomic, copy) NSString *title;
+@end
 
 // @note This integer is after modification of the identifiers array
 #define kMusicSongsTab 2
 
+// For iOS 8.4 (Apple Music)
+%hook SKUICrossFadingTabBar
+- (void)setTabBarButtons:(NSArray *)origTabs {
+    NSMutableArray *tabs = [origTabs mutableCopy];
+    NSUInteger radioIndex = [origTabs indexOfObjectPassingTest:^BOOL (id obj, NSUInteger idx, BOOL *stop) {
+        SKUICrossFadingTabBarButton *btn = (SKUICrossFadingTabBarButton *)obj;
+        if ([btn.title isEqualToString:NSLocalizedString(@"Radio", nil)]) {
+            *stop = YES;
+            return YES;
+        }
+        return NO;
+    }];
+
+    [tabs removeObjectAtIndex:radioIndex];
+    %orig(tabs);
+}
+%end
+
+// For iOS 8.3, iPad only
 %hook MusicTabBarController
 BOOL isFirstRun = YES;
 
