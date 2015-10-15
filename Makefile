@@ -5,6 +5,7 @@ include theos/makefiles/common.mk
 TWEAK_NAME = NoRadioTab
 NoRadioTab_FILES = Tweak.xm
 NoRadioTab_FRAMEWORKS = UIKit
+NoRadioTab_LDFLAGS += -Wl,-segalign,4000
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
