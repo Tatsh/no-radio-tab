@@ -1,4 +1,5 @@
-#import <UIKit/UIKit.h>
+@import ObjectiveC.runtime;
+@import UIKit;
 
 @interface MusicTabBarController : UITabBarController
 @end
@@ -7,6 +8,10 @@
 @interface SKUICrossFadingTabBarButton : UIControl
 @property (nonatomic, copy) NSString *title;
 @end
+
+typedef NSString * _Nonnull MusicNavigationControllerTitle NS_TYPED_ENUM;
+static MusicNavigationControllerTitle MusicNavigationControllerTitleLibrary;
+static MusicNavigationControllerTitle MusicNavigationControllerTitleSearch;
 
 // @note This integer is after modification of the identifiers array
 #define kMusicSongsTab 2
@@ -34,7 +39,7 @@
 BOOL isFirstRun = YES;
 
 BOOL isPad() {
-    return [(NSString*)[UIDevice currentDevice].model hasPrefix:@"iPad"];
+    return [(NSString *)UIDevice.currentDevice.model hasPrefix:@"iPad"];
 }
 
 /**
@@ -69,3 +74,24 @@ BOOL isPad() {
     isFirstRun = NO;
 }
 %end
+
+%hook MusicTabBarControllerSwift
+- (void)setViewControllers:(NSArray<__kindof UIViewController *> *)viewControllers
+animated:(BOOL)animated {
+    NSMutableArray *mut = [NSMutableArray<__kindof UIViewController *> new];
+
+    for (MusicNavigationController *vc in viewControllers) {
+        if ([vc.title isEqualToString:MusicNavigationControllerTitleLibrary] ||
+            [vc.title isEqualToString:MusicNavigationControllerTitleSearch]) {
+            [mut addObject:vc];
+        }
+    }
+    %orig(mut, animated);
+}
+%end
+
+%ctor {
+    %init(MusicTabBarControllerSwift = objc_getClass("Music.TabBarController"));
+    MusicNavigationControllerTitleLibrary = [NSBundle.mainBundle localizedStringForKey:@"LIBRARY_TAB_TITLE" value:@"Library" table:@"Music"];
+    MusicNavigationControllerTitleSearch = [NSBundle.mainBundle localizedStringForKey:@"SEARCH_TAB_TITLE" value:@"Search" table:@"Music"];
+}
